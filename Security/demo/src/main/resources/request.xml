@@ -1,0 +1,9 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:gs="http://localhost:8080/demo/gen">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <gs:getRegistrationRequest>
+      <gs:email>Spain</gs:email>
+    </gs:getRegistrationRequest>
+  </soapenv:Body>
+</soapenv:Envelope>
