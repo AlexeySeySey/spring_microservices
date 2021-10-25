@@ -1,40 +1,63 @@
 package com.example.demo.controller;
 
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.client.SecurityClient;
+import com.example.demo.client.gen.GetLoginRequest;
+import com.example.demo.client.gen.GetRegistrationRequest;
+import com.example.demo.client.gen.Response;
+import com.example.demo.service.ResponseFactory;
+import com.example.demo.service.ServletService;
 
 @RestController
 @RequestMapping("/security")
 public class SecurityController {
+	
+  @Autowired	
+  private SecurityClient securityClient;
+  
+  @Autowired
+  private ServletService servletService;
+  
+  @Autowired
+  private ResponseFactory responseFactory;
 
   @PostMapping("/register")
-  public String register() {
-    // TODO: user submit his data for registration, user gets mail on his mailbox
-    return "";
+  public Map<String, String> register(@RequestBody GetRegistrationRequest registrationRequest) throws Exception {
+	  
+    Response response = this.securityClient
+    		.register(registrationRequest.getEmail(), registrationRequest.getPassword())
+    		.getResponse();
+    
+    String error = response.getError();
+    if (error != null) {
+    	throw new Exception(error);
+    }
+    
+    return this.responseFactory.make(response.getData(), "");
   }
 
-  @PostMapping("/sign-in")
-  public String signIn() {
-    // TODO: user submit his data to log in and get's a token string
-    return "";
-  }
-
-  @PostMapping("/sign-out")
-  public String signOut() {
-    // TODO: user trying to logout from system
-    return "";
-  }
-
-  @PostMapping("g-sign-in")
-  public String googleSignIn() {
-    // TODO: user trying to log in via Google account
-    return "";
-  }
-
-  @PostMapping("recover-password")
-  public String restorePassword() {
-    // TODO: user clicks "Forget password?" and thus trying to restore his password
-    return "";
+  @PostMapping("/signin")
+  public Map<String, String> signin(@RequestBody GetLoginRequest loginRequest) throws Exception {
+	  
+    Response response = this.securityClient
+    		.signin(loginRequest.getEmail(), loginRequest.getPassword())
+    		.getResponse();
+    
+    String error = response.getError();
+    if (error != null) {
+    	throw new Exception(error);
+    }
+    
+    return this.responseFactory.make(response.getData(), "");
   }
 }

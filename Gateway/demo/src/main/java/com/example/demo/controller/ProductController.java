@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
-import com.example.demo.client.CountryClient;
+import com.example.demo.annotation.Protected;
+import com.example.demo.client.SecurityClient;
 import com.example.demo.service.ResponseFactory;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,23 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/product")
 public class ProductController {
 
-  private ResponseFactory responseFactory;
-
-  private CountryClient countryClient;
-
   @Autowired
-  public ProductController(
-      ResponseFactory responseFactory,
-      CountryClient countryClient
-  ) {
-    this.responseFactory = responseFactory;
-    this.countryClient = countryClient;
-  }
+  private ResponseFactory responseFactory;
 
   @GetMapping("/list")
   public Object list() {
     // TODO: get products including search, pagination, and picking products by category
-    return this.countryClient.getCountry("Spain");
+    return "Product List";
   }
 
   @PostMapping("/create")

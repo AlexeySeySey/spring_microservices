@@ -35,16 +35,17 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-
-  <xs:element name="getLogoutRequest">
+  
+  <xs:element name="getAccessRequest">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="token" type="xs:string"/>
+        <xs:element minOccurs="1" nillable="false" name="token" type="xs:string"/>
+        <xs:element minOccurs="1" nillable="false" name="access" type="xs:string"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
 
-  <xs:element name="getLogoutResponse">
+  <xs:element name="getAccessResponse">
     <xs:complexType>
       <xs:sequence>
         <xs:element name="response" type="tns:response"/>

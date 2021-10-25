@@ -1,0 +1,10 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:gs="http://localhost:8080/demo/gen">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <gs:getAccessRequest>
+      <gs:token>eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmb29AYmFyLmJheiIsImV4cCI6MTYzNDk5NDkxMiwiaWF0IjoxNjM0OTA4NTEyfQ.ys7JOkxN88d0Y22Kz5ZA5hEuC_Rx1lh6BKwiuiE8-zdgjugLg85bP18B49d05Z1XS-0SPs-jpr2GUN0HFbLXfA</gs:token>
+      <gs:access>ProductController.list</gs:access>
+    </gs:getAccessRequest>
+  </soapenv:Body>
+</soapenv:Envelope>

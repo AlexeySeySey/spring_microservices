@@ -2,8 +2,9 @@
   xmlns:gs="http://localhost:8080/demo/gen">
   <soapenv:Header/>
   <soapenv:Body>
-    <gs:getRegistrationRequest>
-      <gs:email>Spain</gs:email>
-    </gs:getRegistrationRequest>
+    <gs:getLoginRequest>
+      <gs:email>foo@bar.baz</gs:email>
+      <gs:password>rootsecret</gs:password>
+    </gs:getLoginRequest>
   </soapenv:Body>
 </soapenv:Envelope>
