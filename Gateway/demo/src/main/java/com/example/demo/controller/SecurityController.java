@@ -5,6 +5,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,32 +34,22 @@ public class SecurityController {
   private ResponseFactory responseFactory;
 
   @PostMapping("/register")
-  public Map<String, String> register(@RequestBody GetRegistrationRequest registrationRequest) throws Exception {
+  public Map<String, Object> register(@RequestBody GetRegistrationRequest registrationRequest) {
 	  
     Response response = this.securityClient
     		.register(registrationRequest.getEmail(), registrationRequest.getPassword())
     		.getResponse();
     
-    String error = response.getError();
-    if (error != null) {
-    	throw new Exception(error);
-    }
-    
-    return this.responseFactory.make(response.getData(), "");
+    return this.responseFactory.make(response.getData(), response.getError());
   }
 
   @PostMapping("/signin")
-  public Map<String, String> signin(@RequestBody GetLoginRequest loginRequest) throws Exception {
+  public Map<String, Object> signin(@RequestBody GetLoginRequest loginRequest) {
 	  
     Response response = this.securityClient
     		.signin(loginRequest.getEmail(), loginRequest.getPassword())
     		.getResponse();
-    
-    String error = response.getError();
-    if (error != null) {
-    	throw new Exception(error);
-    }
-    
-    return this.responseFactory.make(response.getData(), "");
+
+    return this.responseFactory.make(response.getData(), response.getError());
   }
 }

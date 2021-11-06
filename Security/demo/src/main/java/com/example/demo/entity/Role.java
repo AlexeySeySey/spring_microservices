@@ -5,6 +5,7 @@ import javax.persistence.FetchType;
 import javax.persistence.Table;
 import javax.persistence.JoinColumn;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,7 +23,7 @@ public final class Role {
 	public static final String TABLE = "roles";
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", nullable = false)
 	private Long id;
 

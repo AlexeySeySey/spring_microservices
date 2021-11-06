@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class ResponseFactory {
 
-  public HashMap<String, String> make(String data, String error) {
-    HashMap<String, String> response = new HashMap<String, String>();
+  public HashMap<String, Object> make(Object data, String error) {
+    HashMap<String, Object> response = new HashMap<String, Object>();
     response.put("data", data);
     response.put("errors", error);
     return response;

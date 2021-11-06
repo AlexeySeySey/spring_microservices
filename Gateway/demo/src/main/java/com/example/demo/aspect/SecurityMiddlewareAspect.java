@@ -2,6 +2,10 @@ package com.example.demo.aspect;
 
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import com.example.demo.constant.Error;
+
 import java.lang.reflect.Method;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -16,6 +20,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.example.demo.client.SecurityClient;
 import com.example.demo.client.gen.Response;
 import com.example.demo.service.ServletService;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 @Aspect
 @Component
@@ -36,11 +43,17 @@ public class SecurityMiddlewareAspect {
 
 		var request = this.servletService.getCurrentRequest();
 		
-		String token = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
-				.getRequest()
-				.getHeader("Authorization")
-				.replaceAll("Bearer:", "")
-				.replaceAll("\\s", "")
+		ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+		
+		String authHeader = requestAttributes.getRequest().getHeader("Authorization");
+
+		if (authHeader == null) {
+			String error = Error.UNAUTHORIZED.get();
+			throw new Exception(error);
+		}
+
+		String token = authHeader.replace("Bearer:", "")
+				.replace("\\s", "")
 				.trim();
 
 		MethodSignature signature = (MethodSignature) point.getSignature();

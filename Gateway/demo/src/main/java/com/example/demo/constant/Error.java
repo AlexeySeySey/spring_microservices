@@ -2,6 +2,7 @@ package com.example.demo.constant;
 
 public enum Error {
 
+	UNAUTHORIZED("Unauthorized"),
 	UNPROCESSABLE_REQUEST("Request cannot be processed");
 	
 	private String data;

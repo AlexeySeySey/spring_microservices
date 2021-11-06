@@ -7,6 +7,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -20,6 +22,8 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
 
 	@Autowired
 	private ResponseFactory responseFactory;
+	
+	private static final Logger logger = LogManager.getLogger(ExceptionHandlerFilter.class);
 
 	@Override
 	public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -30,13 +34,27 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
 
 			ObjectMapper mapper = new ObjectMapper();
 
-			Throwable cause = e.getCause();
-			String causeMessage = cause.getMessage();
-			String error = causeMessage == null
-					? cause.getCause().getMessage()
-					: causeMessage;
+			StringBuilder error = new StringBuilder();
 
-			var responseData = this.responseFactory.make("", e.getCause().getMessage());
+			if (e.getMessage() != null) {
+				error.append(" " + e.getMessage() + "\n");
+			}
+			if (e.getCause() != null) {
+				if (e.getCause().getMessage() != null) {
+					error.append(e.getCause().getMessage() + "\n");
+				}
+				if (e.getCause().getCause() != null) {
+					if (e.getCause().getCause().getMessage() != null) {
+						error.append(e.getCause().getCause().getMessage() + "\n");
+					}
+				}
+			}
+			
+			String errorMessage = error.toString();
+			
+			logger.error("ERROR", e);
+			
+			var responseData = this.responseFactory.make("", errorMessage);
 
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 			response.getWriter().write(mapper.writeValueAsString(responseData));

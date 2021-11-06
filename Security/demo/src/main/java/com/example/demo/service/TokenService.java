@@ -14,12 +14,12 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
 
 @Service
-public final class TokenService {
+public class TokenService {
 
 	    @Value("${jwt.secret}")
 	    private String secretKey;
 
-	    private Claims getClaimsFromToken(String token) throws ExpiredJwtException {
+	    public Claims getClaimsFromToken(String token) throws ExpiredJwtException {
 	    	JwtParser parser = Jwts.parser();
 	    	parser.setSigningKey(secretKey);
 	    	Jws<Claims> claims = parser.parseClaimsJws(token);

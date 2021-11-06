@@ -2,6 +2,7 @@ package com.example.demo.constant;
 
 public enum Message {
 	
+	ERROR("ERROR"),
 	ACCESS_ALLOWED("Access allowed"),
 	REGISTRATION_SUCCEED("Successfully registered");
 	

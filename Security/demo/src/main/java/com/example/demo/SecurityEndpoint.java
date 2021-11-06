@@ -10,6 +10,7 @@ import com.example.demo.gen.Response;
 import com.example.demo.factory.ResponseFactory;
 import com.example.demo.service.TokenService;
 import com.example.demo.service.UserService;
+import com.example.demo.exception.UserNotFoundException;
 
 import io.jsonwebtoken.ExpiredJwtException;
 
@@ -18,6 +19,10 @@ import com.example.demo.constant.Message;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
@@ -35,13 +40,12 @@ public class SecurityEndpoint {
 	private UserService userService;
 
 	@Autowired
-	private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-	@Autowired
 	private TokenService tokenService;
 
 	@Autowired
 	private ResponseFactory responseFactory;
+
+	private static final Logger logger = LogManager.getLogger(SecurityEndpoint.class);
 
 	@PayloadRoot(namespace = NAMESPACE_URI, localPart = "getRegistrationRequest")
 	@ResponsePayload
@@ -51,18 +55,24 @@ public class SecurityEndpoint {
 
 		try {
 			String email = request.getEmail();
+			String password = request.getPassword();
 
-			if (!this.userService.isUniqueByEmail(email)) {
+			User user = null;
+			
+			try {
+				user = this.userService.findByEmail(email);
+			} catch (UserNotFoundException e) {
+			}
+			
+			if (user != null) {
 				throw new Exception(Error.USER_REGISTERED.get());
 			}
 
-			String encodedPassword = this.bCryptPasswordEncoder.encode(request.getPassword());
-
-			this.userService.registerUser(email, encodedPassword);
+			this.userService.registerUser(email, password);
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			error = e.getMessage();
+			logger.error(Message.ERROR.get(), e);
 		}
 
 		Response response = this.responseFactory.make(Message.REGISTRATION_SUCCEED.get(), error);
@@ -77,23 +87,31 @@ public class SecurityEndpoint {
 	@ResponsePayload
 	public GetLoginResponse getLoginRequest(@RequestPayload GetLoginRequest request) {
 
-		String token, error;
-		token = error = null;
+		String token = null;
+		String error = null;
 
 		try {
 			String email = request.getEmail();
 
-			boolean isUserRegistered = this.userService.isRegistered(email, request.getPassword());
-
-			if (!isUserRegistered) {
+			try {
+				
+				User user = this.userService.findByEmail(email);
+				
+				boolean passwordsSame = this.userService.passwordsSame(user, request.getPassword());
+				
+				if (!passwordsSame) {
+					throw new UserNotFoundException();
+				}
+				
+			} catch (UserNotFoundException e) {
 				throw new Exception(Error.UNREGISTERED_USER.get());
 			}
 
 			token = this.tokenService.generateToken(email);
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			error = e.getMessage();
+			logger.error(Message.ERROR.get(), e);
 		}
 
 		Response response = this.responseFactory.make(token, error);
@@ -114,25 +132,25 @@ public class SecurityEndpoint {
 			String token = request.getToken();
 			String access = request.getAccess();
 			String email = null;
-			
+
 			try {
 				email = this.tokenService.pluckEmail(token);
 			} catch (JwtException e) {
 				throw new Exception(Error.UNAUTHORIZED.get());
 			}
-			
+
 			User user = this.userService.findByEmail(email);
-			
+
 			boolean accessAllowed = user.getRole().getPermissions().stream()
 					.anyMatch((permission) -> permission.getName().equals(access));
-		
+
 			if (!accessAllowed) {
 				throw new Exception(Error.FORBIDDEN.get());
 			}
-			
+
 		} catch (Exception e) {
-			e.printStackTrace();
 			error = e.getMessage();
+			logger.error(Message.ERROR.get(), e);
 		}
 
 		Response response = this.responseFactory.make(Message.ACCESS_ALLOWED.get(), error);

@@ -6,14 +6,17 @@ import java.util.Optional;
 import com.example.demo.constant.Error;
 import com.example.demo.constant.RoleName;
 
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
+import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.exception.UserNotFoundException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -25,28 +28,25 @@ public class UserService {
 	private UserRepository userRepository;
 	
 	@Autowired
-	private BCryptPasswordEncoder bCryptPasswordEncoder;
+	private RoleRepository roleRepository;
 	
 	@PersistenceContext
     private EntityManager em;
 	
-	public boolean isUniqueByEmail(String email) {	
-		return this.userRepository
-				.findByEmail(email)
-				.size() == 0;
-	}
+	@Autowired
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
-	@Transactional
+	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void registerUser(String email, String password) throws Exception {
 		
-		Role role = (Role) this.em
-				.createQuery("select r from Role r where r.name = :role", Role.class)
-				.setParameter("role", RoleName.CLIENT.get())
-				.getSingleResult();
+		List<Role> roles = this.roleRepository.findByName(RoleName.CLIENT.get());
 		
-		if (role == null) {
+		if (roles.size() == 0) {
 			throw new Exception(Error.ROLE_ASSIGNMENT.get());
 		}
+		Role role = roles.get(0);
+		
+		password = this.bCryptPasswordEncoder.encode(password);
 		
 		this.userRepository.create(email, password);
 		
@@ -57,24 +57,19 @@ public class UserService {
 		this.em.flush();
 	}
 	
-	public boolean isRegistered(String email, String password) {
-		User user = null;
-		try {
-			user = this.userRepository.findByEmail(email).get(0);
-		} catch (IndexOutOfBoundsException e) {
-			return false;
-		}
-		return this.bCryptPasswordEncoder.matches(password, user.getPassword());
-	}
-	
+	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public User findByEmail(String email) throws Exception {
 		
 		List<User> users = this.userRepository.findByEmail(email);
 		
 		if (users.size() == 0) {
-			throw new Exception(Error.USER_NOT_FOUND.get());
+			throw new UserNotFoundException(Error.USER_NOT_FOUND.get());
 		}
 		
 		return users.get(0);
+	}
+	
+	public boolean passwordsSame(User user, String password) {
+		return this.bCryptPasswordEncoder.matches(password, user.getPassword());
 	}
 }
