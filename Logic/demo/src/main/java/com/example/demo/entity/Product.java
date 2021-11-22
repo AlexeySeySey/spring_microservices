@@ -1,14 +1,19 @@
 package com.example.demo.entity;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.*;
 
+import com.example.demo.contract.DTOable;
+
 @Entity
 @Table(name=Product.TABLE)
-public class Product {
-	
+public class Product implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
 	public static final String TABLE = "products";
 	
 	@Id
@@ -32,7 +37,7 @@ public class Product {
 	private Date updatedAt;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "category_id", referencedColumnName = "id")    
+	@JoinColumn(name = "category_id")    
 	private Category category;
 	
 	public Category getCategory() {

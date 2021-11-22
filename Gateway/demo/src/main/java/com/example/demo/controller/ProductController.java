@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.annotation.Protected;
 import com.example.demo.mq.KafkaProducer;
 import com.example.demo.mq.request.ProductListRequest;
+import com.example.demo.mq.request.ProductStoreRequest;
+import com.example.demo.mq.response.KafkaBaseResponse;
 import com.example.demo.mq.response.ProductListResponse;
 import com.example.demo.service.ResponseFactory;
 import com.example.demo.service.ServletService;
@@ -35,28 +37,25 @@ import java.lang.reflect.Type;
 import com.google.gson.reflect.TypeToken;
 
 @RestController
-@RequestMapping("/product")
+@RequestMapping("/products")
 public class ProductController {
 
 	@Autowired
 	private KafkaProducer kafkaProducer;
 
 	@Autowired
-	private ProductListResponse productListResponse;
+	private ResponseFactory responseFactory;
 	
 	@Autowired
-	private ResponseFactory responseFactory;
+	private ProductListResponse productListResponse;
 
 	@Protected
-	@GetMapping("/list")
+	@GetMapping("/")
 	public Map<String, Object> list(ProductListRequest productListRequest) throws Exception {
-		
-		String response = this.kafkaProducer.request("ProductController.list", productListRequest.asJson()).withResponse(productListResponse);
-		
-		Type type = new TypeToken<Map<String, Object>>() {
-		}.getType();
-		Map<String, Object> parsedResponse = new Gson().fromJson(response, type);
-		
-		return this.responseFactory.make(parsedResponse.get("data"), (String) parsedResponse.get("error"));
+
+		Map<String, Object> response = this.kafkaProducer.request("ProductController.list", productListRequest.asJson())
+				.withResponse(productListResponse);
+
+		return this.responseFactory.makeFromKafkaResponse(response);
 	}
 }

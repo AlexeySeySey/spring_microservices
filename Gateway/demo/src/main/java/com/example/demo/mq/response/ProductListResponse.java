@@ -1,10 +1,9 @@
 package com.example.demo.mq.response;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
 
-@Service
+@Component
 public class ProductListResponse extends KafkaBaseResponse {
 	//
 }

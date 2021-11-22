@@ -1,15 +1,22 @@
 package com.example.demo.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
+import java.util.Set;
 import javax.persistence.*;
+
+import com.example.demo.contract.DTOable;
+import com.example.demo.contract.IDTO;
+import com.example.demo.dto.CategoryDTO;
 
 @Entity
 @Table(name=Category.TABLE)
-public class Category {
+public class Category implements Serializable, DTOable {
 	
+	private static final long serialVersionUID = 1L;
+
 	public static final String TABLE = "categories";
 	
 	@Id
@@ -26,16 +33,16 @@ public class Category {
 	@Column(name="updated_at", unique=false, nullable=true)
 	private Date updatedAt;
 	
-	@OneToMany(targetEntity = Product.class, mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.EAGER)    
+	// transient - to ignore field in json serialization
+	@OneToMany(mappedBy="category", fetch=FetchType.LAZY)
 	private List<Product> products = new ArrayList<>();
+	
+	public void setProducts(List<Product> products) {
+		this.products = products;
+	}
 	
 	public List<Product> getProducts() {
 		return this.products;
-	}
-	
-	public Category setProducts(List<Product> products) {
-		this.products = products;
-		return this;
 	}
 	
 	public Long getId() {
@@ -87,5 +94,13 @@ public class Category {
 	protected void prePersist() {
 		if (this.createdAt == null) this.createdAt = new Date();
 		if (this.updatedAt == null) this.updatedAt = new Date();
+	}
+
+	@Override
+	public IDTO dtofy() {
+	   CategoryDTO dto = new CategoryDTO();
+	   dto.setId(this.id);
+	   dto.setName(this.name);
+	   return dto;
 	}
 }

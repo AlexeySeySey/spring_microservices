@@ -1,12 +1,18 @@
 package com.example.demo.service;
 
 import java.util.HashMap;
+import java.util.stream.Collectors;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Selection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,8 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.entity.Category;
 import com.example.demo.entity.Product;
-
-import com.example.demo.repository.ProductRepository;
 
 import org.springframework.data.domain.Sort;
 
@@ -29,39 +33,28 @@ public class ProductService {
 	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public List<Product> findAll(String name, String category) {
 		
+		CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+		
+		CriteriaQuery<Object> criteriaQuery = criteriaBuilder.createQuery();
+		
+		Root<Product> from = criteriaQuery.from(Product.class);
+		
+		CriteriaQuery<Object> select = criteriaQuery.select(from);
+		
+		criteriaQuery.where(criteriaBuilder.equal(criteriaBuilder.literal(1), 1));
+		
 		boolean nameEmpty = name == "" || name == null;
-		boolean categoryEmpty = category == "" || category == null;
-		
-		StringBuilder query = new StringBuilder("select * from " + Product.TABLE);
-		if (!(nameEmpty && categoryEmpty)) {
-			
-			query.append(" where");
-			
-			if (name != null) {
-				query.append(" name LIKE ?1");
-			}
-			if (category != null) {
-				query.append(name != null ? " and" : " ");
-				query.append(" category_id = ?2");
-			}
-		}
-		
-		query.append(" order by created_at ASC");
-		
-		Query q = em.createNativeQuery(query.toString());
-		
 		if (!nameEmpty) {
-			q.setParameter(1, "%"+name+"%");
+			criteriaQuery.where(criteriaBuilder.like(from.get("name"), "%" + name + "%"));
 		}
+		
+		boolean categoryEmpty = category == "" || category == null;
 		if (!categoryEmpty) {
-			q.setParameter(2, category);
+			criteriaQuery.where(criteriaBuilder.equal(from.get("category").get("id"), category));
 		}
 		
-		System.out.println("PRODUCTS: ");
-		System.out.println(q.getResultList());
-
-		List<Product> products = q.getResultList();
+		TypedQuery<Object> typedQuery = em.createQuery(select);
 		
-		return products;
+		return (List<Product>) typedQuery.getResultList().stream().map(Product.class::cast).collect(Collectors.toList());
 	}
 }

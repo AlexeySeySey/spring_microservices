@@ -1,7 +1,11 @@
 package com.example.demo.mq.response;
 
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
+import javax.annotation.PostConstruct;
+
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
+import org.springframework.context.annotation.ScopedProxyMode;
 
 public abstract class KafkaBaseResponse {
 
@@ -9,24 +13,20 @@ public abstract class KafkaBaseResponse {
 	
 	protected String error;
 
-	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public synchronized void setData(String data) {
 		this.data = data;
 	}
 
-	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public synchronized String getData() {
 		String data = this.data;
 		this.data = null;
 		return data;
 	}
 	
-	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public synchronized void setError(String error) {
 		this.error = error;
 	}
 
-	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public synchronized String getError() {
 		String data = this.data;
 		this.data = null;
