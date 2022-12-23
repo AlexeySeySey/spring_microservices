@@ -1,177 +1,175 @@
 package com.example.demo.Unit;
 
-import java.awt.List;
-import java.util.ArrayList;
+import static org.mockito.ArgumentMatchers.any;
 
+import com.example.demo.constant.Error;
+import com.example.demo.dto.UserDto;
+import com.example.demo.entity.Role;
+import com.example.demo.entity.User;
+import com.example.demo.repository.RoleRepository;
+import com.example.demo.repository.UserRepository;
+import com.example.demo.service.UserService;
+import java.util.Optional;
 import javax.persistence.EntityManager;
-
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockingDetails;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import com.example.demo.constant.Error;
-import com.example.demo.constant.RoleName;
-import com.example.demo.entity.Role;
-import com.example.demo.entity.User;
-import com.example.demo.exception.UserNotFoundException;
-import com.example.demo.repository.RoleRepository;
-import com.example.demo.repository.UserRepository;
-import com.example.demo.service.UserService;
-import org.mockito.internal.util.MockUtil;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
-	@Mock
-	private UserRepository userRepository;
-	
-	@Mock
-	private RoleRepository roleRepository;
+  @Mock
+  private UserRepository userRepository;
 
-	@Mock
-	private BCryptPasswordEncoder bCryptPasswordEncoder;
-	
-	@Mock
-	private EntityManager em;
+  @Mock
+  private RoleRepository roleRepository;
 
-	@InjectMocks
-	private UserService userService;
+  @Mock
+  private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-	@Test
-	public void findByEmailSuccess() {
+  @Mock
+  private EntityManager em;
 
-		var wrapper = new Object() {
-			User user = null;
-			String emailValue = "foo@foo.foo";
-		};
+  @InjectMocks
+  private UserService userService;
 
-		User user = new User();
-		user.setId(Long.valueOf(1));
-		user.setEmail(wrapper.emailValue);
-		user.setPassword("bar");
+  @Test
+  public void findByEmailSuccess() {
 
-		ArrayList<User> users = new ArrayList<User>();
-		users.add(user);
+    String emailValue = "foo@foo.foo";
 
-		Mockito.when(userRepository.findByEmail(wrapper.emailValue)).thenReturn(users);
+    User user = new User();
+    user.setId(1L);
+    user.setEmail(emailValue);
+    user.setPassword("bar");
 
-		Assertions.assertDoesNotThrow(() -> {
-			wrapper.user = userService.findByEmail(wrapper.emailValue);
-		});
+    Mockito.when(userRepository.findByEmail(emailValue)).thenReturn(Optional.of(user));
 
-		Assertions.assertNotNull(wrapper.user);
-		Assertions.assertEquals(wrapper.user.getEmail(), wrapper.emailValue);
-	}
+    UserDto userDto = userService.findByEmail(emailValue).orElse(null);
 
-	@Test
-	public void findByEmailFailed() {
+    Assertions.assertNotNull(userDto);
+    Assertions.assertEquals(userDto.getEmail(), emailValue);
+  }
 
-		var wrapper = new Object() {
-			User user = null;
-			String emailValue = "foo";
-		};
+  @Test
+  public void findByEmailFailed() {
 
-		Mockito.when(userRepository.findByEmail(wrapper.emailValue)).thenReturn(new ArrayList<User>());
+    String emailValue = "foo@foo.foo";
 
-		Assertions.assertThrows(UserNotFoundException.class, () -> {
-			wrapper.user = userService.findByEmail(wrapper.emailValue);
-		});
+    Mockito.when(userRepository.findByEmail(emailValue)).thenReturn(Optional.empty());
 
-		Assertions.assertNull(wrapper.user);
-	}
+    Optional<UserDto> user = userService.findByEmail(emailValue);
 
-	@Test
-	public void passwordsSame() {
+    Assertions.assertTrue(user.isEmpty());
+  }
 
-		String password = "foobarbaz";
+  @Test
+  public void passwordsSame() {
 
-		String encodedPassword = new BCryptPasswordEncoder().encode(password);
+    String password = "foo";
+    String encodedPassword = "bar";
 
-		Mockito.when(bCryptPasswordEncoder.matches(password, encodedPassword)).thenReturn(true);
+    Mockito.when(bCryptPasswordEncoder.matches(password, encodedPassword)).thenReturn(true);
 
-		User user = new User();
-		user.setId(Long.valueOf(1));
-		user.setEmail("foo");
-		user.setPassword(encodedPassword);
+    Assertions.assertTrue(userService.passwordsSame(password, encodedPassword));
+  }
 
-		boolean passwordsSame = userService.passwordsSame(user, password);
+  @Test
+  public void passwordsDifferent() {
 
-		Assertions.assertTrue(passwordsSame);
-	}
+    String password = "foo";
+    String encodedPassword = "bar";
 
-	@Test
-	public void passwordsDifferent() {
+    Mockito.when(bCryptPasswordEncoder.matches(password, encodedPassword)).thenReturn(false);
 
-		String password = "foobarbaz";
+    Assertions.assertFalse(userService.passwordsSame(password, encodedPassword));
+  }
 
-		String encodedPassword = new BCryptPasswordEncoder().encode("test");
+  @Test
+  public void registrationSuccess() {
 
-		Mockito.when(bCryptPasswordEncoder.matches(password, encodedPassword)).thenReturn(false);
+    String email = "foo@bar.baz";
+    String password = "secret";
 
-		User user = new User();
-		user.setId(Long.valueOf(1));
-		user.setEmail("foo");
-		user.setPassword(encodedPassword);
+    Role role = new Role();
+    role.setId(1L);
+    role.setName("client");
 
-		boolean passwordsSame = userService.passwordsSame(user, password);
+    Mockito.when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+    Mockito.when(roleRepository.findByName("client")).thenReturn(Optional.of(role));
+    Mockito.when(userRepository.save(any(User.class))).thenAnswer((i) -> i.getArguments()[0]);
 
-		Assertions.assertFalse(passwordsSame);
-	}
-	
-	@Test
-	public void registrationFailedRoleAssignment() {
-		
-		Mockito.when(roleRepository.findByName(RoleName.CLIENT.get())).thenReturn(new ArrayList<Role>());
-		
-		Exception exception = Assertions.assertThrows(Exception.class, () -> {
-			userService.registerUser("", "");
-		});
-		
-		Assertions.assertEquals(exception.getMessage(), Error.ROLE_ASSIGNMENT.get());
-	}
-	
-	@Test
-	public void reigstrationSuccess() {
-		
-		ArrayList<Role> roles = new ArrayList<Role>();
-		
-		Role role = new Role();
-		role.setName(RoleName.CLIENT.get());
-		
-		roles.add(role);
-		
-		Mockito.when(roleRepository.findByName(RoleName.CLIENT.get())).thenReturn(roles);
-		
-		var wrapper = new Object() {
-			String email = "foo@foo.foo";
-			String password = "foobarbaz";
-		};
-		
-		String encodedPassword = new BCryptPasswordEncoder().encode(wrapper.password);
-		
-		Mockito.when(bCryptPasswordEncoder.encode(wrapper.password)).thenReturn(encodedPassword);
-		
-		User user = new User();
-		user.setId(Long.valueOf(1));
-		user.setEmail(wrapper.email);
-		user.setPassword(wrapper.password);
-		
-		ArrayList<User> users = new ArrayList<User>();
-		users.add(user);
-		
-		Mockito.when(userRepository.findByEmail(wrapper.email)).thenReturn(users);
-		
-		Assertions.assertDoesNotThrow(() -> {
-			userService.registerUser(wrapper.email, wrapper.password);
-		});
-	}
+    var userSaved = new Object() {
+      User user = null;
+    };
+    Assertions.assertDoesNotThrow(() -> userSaved.user = userService.registerUser(email, password));
+    Assertions.assertEquals(email, userSaved.user.getEmail());
+    Assertions.assertEquals(role, userSaved.user.getRole());
+    Assertions.assertTrue(userSaved.user.getRole().getPermissions().isEmpty());
+  }
+
+  @Test
+  public void registrationFailedUserAlreadyRegistered() {
+    String email = "foo@bar.baz";
+    String password = "secret";
+
+    User user = new User();
+    user.setEmail(email);
+    user.setPassword(password);
+
+    Mockito.when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+
+    Exception exception = Assertions.assertThrows(Exception.class, () -> {
+      userService.registerUser(email, password);
+    });
+
+    Assertions.assertEquals(exception.getMessage(), Error.USER_REGISTERED.get());
+
+    Mockito.verify(roleRepository, Mockito.never()).findByName("client");
+    Mockito.verify(bCryptPasswordEncoder, Mockito.never()).encode(password);
+    Mockito.verify(userRepository, Mockito.never()).save(any(User.class));
+  }
+
+  @Test
+  public void registrationFailedRoleNotFound() {
+    String email = "foo@bar.baz";
+    String password = "secret";
+
+    Mockito.when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+    Mockito.when(roleRepository.findByName("client")).thenReturn(Optional.empty());
+
+    Exception exception = Assertions.assertThrows(Exception.class, () -> {
+      userService.registerUser(email, password);
+    });
+
+    Assertions.assertEquals(exception.getMessage(), Error.ROLE_NOT_FOUND.get());
+
+    Mockito.verify(bCryptPasswordEncoder, Mockito.never()).encode(password);
+    Mockito.verify(userRepository, Mockito.never()).save(any(User.class));
+  }
+
+  @Test
+  public void registrationFailedIllegalPasswordForEncryption() {
+    String email = "foo@bar.baz";
+    String password = null;
+
+    Role role = new Role();
+    role.setId(1L);
+    role.setName("client");
+
+    Mockito.when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+    Mockito.when(roleRepository.findByName("client")).thenReturn(Optional.of(role));
+    Mockito.when(bCryptPasswordEncoder.encode(password)).thenCallRealMethod();
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> {
+      userService.registerUser(email, password);
+    });
+
+    Mockito.verify(userRepository, Mockito.never()).save(any(User.class));
+  }
 }

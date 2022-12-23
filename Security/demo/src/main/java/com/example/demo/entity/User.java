@@ -1,79 +1,63 @@
 package com.example.demo.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Table;
-
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 @Entity
-@Table(name = User.TABLE)
-public final class User {
+@Table(name = "users")
+public class User {
 
-	public static final String TABLE = "users";
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id")
+  private Long id;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id")
-	private Long id;
+  @Column(name = "email", nullable = false, unique = true)
+  private String email;
 
-	@Column(name = "email", nullable = false, unique = true, columnDefinition = "VARCHAR(255)")
-	private String email;
+  @Column(name = "password", nullable = false)
+  private String password;
 
-	@Column(name = "password", nullable = false, unique = false, columnDefinition = "VARCHAR(255)")
-	private String password;
+  @OneToOne(cascade = {CascadeType.ALL})
+  @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)
+  private Role role;
 
-	@OneToOne(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
-	@JoinColumn(name = "role_id", referencedColumnName = "id")
-	private Role role;
+  public Long getId() {
+    return id;
+  }
 
-	public Long getId() {
-		return this.id;
-	}
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-	public User setId(Long id) {
-		this.id = id;
-		return this;
-	}
+  public String getEmail() {
+    return email;
+  }
 
-	public String getEmail() {
-		return this.email;
-	}
+  public void setEmail(String email) {
+    this.email = email;
+  }
 
-	public User setEmail(String email) {
-		this.email = email;
-		return this;
-	}
+  public String getPassword() {
+    return password;
+  }
 
-	public String getPassword() {
-		return this.password;
-	}
+  public void setPassword(String password) {
+    this.password = password;
+  }
 
-	public User setPassword(String password) {
-		this.password = password;
-		return this;
-	}
+  public Role getRole() {
+    return role;
+  }
 
-	public Role getRole() {
-		return this.role;
-	}
-
-	public User setRole(Role role) {
-		this.role = role;
-		return this;
-	}
-
-	@Override
-	public String toString() {
-		return String.format("id:%s\nemail:%s\npassword:%s\nrole:%s", this.id, this.email, this.password, this.role);
-	}
+  public void setRole(Role role) {
+    this.role = role;
+  }
 }

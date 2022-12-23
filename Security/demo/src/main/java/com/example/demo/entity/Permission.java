@@ -1,36 +1,37 @@
 package com.example.demo.entity;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = Permission.TABLE)
+@Table(name = "permissions")
 public class Permission {
 
-	public static final String TABLE = "permissions";
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id")
+  private Long id;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id")
-	private Long id;
+  @Column(name = "name", nullable = false, unique = true)
+  private String name;
 
-	@Column(name = "name", nullable = false, unique = true, columnDefinition = "VARCHAR(255)")
-	private String name;
+  public Long getId() {
+    return id;
+  }
 
-	public Permission setName(String name) {
-		this.name = name;
-		return this;
-	}
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-	public String getName() {
-		return this.name;
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
+  }
 }

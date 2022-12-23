@@ -1,163 +1,132 @@
 package com.example.demo;
 
-import com.example.demo.gen.GetRegistrationRequest;
-import com.example.demo.gen.GetRegistrationResponse;
-import com.example.demo.gen.GetLoginRequest;
-import com.example.demo.gen.GetLoginResponse;
-import com.example.demo.gen.GetAccessRequest;
-import com.example.demo.gen.GetAccessResponse;
-import com.example.demo.gen.Response;
-import com.example.demo.factory.ResponseFactory;
-import com.example.demo.service.TokenService;
-import com.example.demo.service.UserService;
-import com.example.demo.exception.UserNotFoundException;
-
-import io.jsonwebtoken.ExpiredJwtException;
-
 import com.example.demo.constant.Error;
 import com.example.demo.constant.Message;
-import com.example.demo.entity.Role;
-import com.example.demo.entity.User;
-
-import java.util.List;
-
+import com.example.demo.dto.UserDto;
+import com.example.demo.entity.Permission;
+import com.example.demo.factory.ResponseFactory;
+import com.example.demo.gen.GetAccessRequest;
+import com.example.demo.gen.GetAccessResponse;
+import com.example.demo.gen.GetLoginRequest;
+import com.example.demo.gen.GetLoginResponse;
+import com.example.demo.gen.GetRegistrationRequest;
+import com.example.demo.gen.GetRegistrationResponse;
+import com.example.demo.gen.Response;
+import com.example.demo.service.TokenService;
+import com.example.demo.service.UserService;
+import io.jsonwebtoken.JwtException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
-import io.jsonwebtoken.JwtException;
 
 @Endpoint
 public class SecurityEndpoint {
 
-	private static final String NAMESPACE_URI = "http://localhost:8080/demo/gen";
+  public final static String NAMESPACE_URI = "${server.host}:${server.port}${ws.endpoint.url}";
 
-	@Autowired
-	private UserService userService;
+  private UserService userService;
 
-	@Autowired
-	private TokenService tokenService;
+  private TokenService tokenService;
 
-	@Autowired
-	private ResponseFactory responseFactory;
+  private ResponseFactory responseFactory;
 
-	private static final Logger logger = LogManager.getLogger(SecurityEndpoint.class);
+  @Autowired
+  public SecurityEndpoint(
+      UserService userService,
+      TokenService tokenService,
+      ResponseFactory responseFactory
+  ) {
+    this.userService = userService;
+    this.tokenService = tokenService;
+    this.responseFactory = responseFactory;
+  }
 
-	@PayloadRoot(namespace = NAMESPACE_URI, localPart = "getRegistrationRequest")
-	@ResponsePayload
-	public GetRegistrationResponse getRegistrationRequest(@RequestPayload GetRegistrationRequest request) {
+  private static final Logger logger = LogManager.getLogger(SecurityEndpoint.class);
 
-		String error = null;
+  @ResponsePayload
+  @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getRegistrationRequest")
+  public GetRegistrationResponse getRegistrationRequest(
+      @RequestPayload GetRegistrationRequest request) {
 
-		try {
-			String email = request.getEmail();
-			String password = request.getPassword();
+    String error = "";
+    try {
+      userService.registerUser(request.getEmail(), request.getPassword());
+    } catch (Exception e) {
+      error = e.getMessage();
+      logger.error(Message.ERROR.get(), e);
+    }
 
-			User user = null;
-			
-			try {
-				user = this.userService.findByEmail(email);
-			} catch (UserNotFoundException e) {
-			}
-			
-			if (user != null) {
-				throw new Exception(Error.USER_REGISTERED.get());
-			}
+    Response response = responseFactory.make(Message.REGISTRATION_SUCCEED.get(), error);
+    GetRegistrationResponse registrationResponse = new GetRegistrationResponse();
+    registrationResponse.setResponse(response);
+    return registrationResponse;
+  }
 
-			this.userService.registerUser(email, password);
+  @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getLoginRequest")
+  @ResponsePayload
+  public GetLoginResponse getLoginRequest(@RequestPayload GetLoginRequest request) {
 
-		} catch (Exception e) {
-			error = e.getMessage();
-			logger.error(Message.ERROR.get(), e);
-		}
+    String token = null;
+    String error = null;
+    try {
 
-		Response response = this.responseFactory.make(Message.REGISTRATION_SUCCEED.get(), error);
+      UserDto user = userService.findByEmail(request.getEmail())
+          .orElseThrow(() -> new Exception(Error.UNREGISTERED_USER.get()));
 
-		var registrationResponse = new GetRegistrationResponse();
-		registrationResponse.setResponse(response);
+      if (!userService.passwordsSame(user.getPassword(), request.getPassword())) {
+        throw new Exception(Error.UNREGISTERED_USER.get());
+      }
 
-		return registrationResponse;
-	}
+      token = tokenService.generateToken(request.getEmail());
 
-	@PayloadRoot(namespace = NAMESPACE_URI, localPart = "getLoginRequest")
-	@ResponsePayload
-	public GetLoginResponse getLoginRequest(@RequestPayload GetLoginRequest request) {
+    } catch (Exception e) {
+      error = e.getMessage();
+      logger.error(Message.ERROR.get(), e);
+    }
 
-		String token = null;
-		String error = null;
+    Response response = responseFactory.make(token, error);
+    GetLoginResponse loginResponse = new GetLoginResponse();
+    loginResponse.setResponse(response);
+    return loginResponse;
+  }
 
-		try {
-			String email = request.getEmail();
+  @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getAccessRequest")
+  @ResponsePayload
+  public GetAccessResponse getAccessRequest(@RequestPayload GetAccessRequest request) {
 
-			try {
-				
-				User user = this.userService.findByEmail(email);
-				
-				boolean passwordsSame = this.userService.passwordsSame(user, request.getPassword());
-				
-				if (!passwordsSame) {
-					throw new UserNotFoundException();
-				}
-				
-			} catch (UserNotFoundException e) {
-				throw new Exception(Error.UNREGISTERED_USER.get());
-			}
+    String error = "";
+    try {
 
-			token = this.tokenService.generateToken(email);
+      String email = "";
+      try {
+        email = tokenService.pluckEmail(request.getToken());
+      } catch (JwtException e) {
+        throw new Exception(Error.UNAUTHORIZED.get());
+      }
 
-		} catch (Exception e) {
-			error = e.getMessage();
-			logger.error(Message.ERROR.get(), e);
-		}
+      UserDto user = userService.findByEmail(email)
+          .orElseThrow(() -> new Exception(Error.UNREGISTERED_USER.get()));
 
-		Response response = this.responseFactory.make(token, error);
+      boolean accessAllowed = user.getRole().getPermissions().stream()
+          .map(Permission::getName)
+          .anyMatch(request.getAccess()::equals);
 
-		var loginResponse = new GetLoginResponse();
-		loginResponse.setResponse(response);
+      if (!accessAllowed) {
+        throw new Exception(Error.FORBIDDEN.get());
+      }
 
-		return loginResponse;
-	}
+    } catch (Exception e) {
+      error = e.getMessage();
+      logger.error(Message.ERROR.get(), e);
+    }
 
-	@PayloadRoot(namespace = NAMESPACE_URI, localPart = "getAccessRequest")
-	@ResponsePayload
-	public GetAccessResponse getAccessRequest(@RequestPayload GetAccessRequest request) {
-
-		String error = null;
-
-		try {
-			String token = request.getToken();
-			String access = request.getAccess();
-			String email = null;
-
-			try {
-				email = this.tokenService.pluckEmail(token);
-			} catch (JwtException e) {
-				throw new Exception(Error.UNAUTHORIZED.get());
-			}
-
-			User user = this.userService.findByEmail(email);
-
-			boolean accessAllowed = user.getRole().getPermissions().stream()
-					.anyMatch((permission) -> permission.getName().equals(access));
-
-			if (!accessAllowed) {
-				throw new Exception(Error.FORBIDDEN.get());
-			}
-
-		} catch (Exception e) {
-			error = e.getMessage();
-			logger.error(Message.ERROR.get(), e);
-		}
-
-		Response response = this.responseFactory.make(Message.ACCESS_ALLOWED.get(), error);
-
-		var accessResponse = new GetAccessResponse();
-		accessResponse.setResponse(response);
-
-		return accessResponse;
-	}
+    Response response = responseFactory.make(Message.ACCESS_ALLOWED.get(), error);
+    GetAccessResponse accessResponse = new GetAccessResponse();
+    accessResponse.setResponse(response);
+    return accessResponse;
+  }
 }

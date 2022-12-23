@@ -9,15 +9,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration  extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+
   @Override
-  protected void configure(HttpSecurity http) throws Exception{
+  protected void configure(HttpSecurity http) throws Exception {
     http.authorizeRequests().antMatchers("/").permitAll();
     http.csrf().disable();
   }
-  
+
   @Bean
   public BCryptPasswordEncoder bCryptPasswordEncoder() {
-	  return new BCryptPasswordEncoder();
+    return new BCryptPasswordEncoder();
   }
 }

@@ -1,58 +1,56 @@
 package com.example.demo.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Table;
-import javax.persistence.JoinColumn;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 
 @Entity
-@Table(name = Role.TABLE)
-public final class Role {
+@Table(name = "roles")
+public class Role {
 
-	public static final String TABLE = "roles";
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id")
+  private Long id;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id", nullable = false)
-	private Long id;
+  @Column(name = "name", nullable = false, unique = true)
+  private String name;
 
-	@Column(name = "name", nullable = false, unique = true, columnDefinition = "VARCHAR(255)")
-	private String name;
+  @ManyToMany(cascade = {CascadeType.ALL})
+  @JoinTable(name = "role_permission", joinColumns = {@JoinColumn(name = "role_id")},
+      inverseJoinColumns = {@JoinColumn(name = "permission_id")})
+  Set<Permission> permissions = new HashSet<>();
 
-	public Role setName(String name) {
-		this.name = name;
-		return this;
-	}
+  public Long getId() {
+    return id;
+  }
 
-	public String getName() {
-		return this.name;
-	}
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-	@ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
-	@JoinTable(name = "role_permission", joinColumns = { @JoinColumn(name = "role_id") }, inverseJoinColumns = {
-			@JoinColumn(name = "permission_id") })
-	Set<Permission> permissions = new HashSet<>();
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	public void setPermissions(Set<Permission> permissions) {
-		this.permissions = permissions;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public Set<Permission> getPermissions() {
-		return this.permissions;
-	}
-	
-	public String toString() {
-		return String.format("name:%s", this.name);
-	}
+  public void setPermissions(Set<Permission> permissions) {
+    this.permissions = permissions;
+  }
+
+  public Set<Permission> getPermissions() {
+    return permissions;
+  }
 }
