@@ -1,13 +1,13 @@
 package com.example.demo.dto;
 
 import java.util.Date;
+import java.util.Set;
 
-public class UserDto {
+public class RoleDto {
 
   private Long id;
-  private String email;
-  private String password;
-  private RoleDto role;
+  private String name;
+  Set<PermissionDto> permissions;
   private Date createdAt;
   private Date updatedAt;
 
@@ -19,28 +19,20 @@ public class UserDto {
     this.id = id;
   }
 
-  public String getEmail() {
-    return email;
+  public String getName() {
+    return name;
   }
 
-  public void setEmail(String email) {
-    this.email = email;
+  public void setName(String name) {
+    this.name = name;
   }
 
-  public String getPassword() {
-    return password;
+  public Set<PermissionDto> getPermissions() {
+    return permissions;
   }
 
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
-  public RoleDto getRole() {
-    return role;
-  }
-
-  public void setRole(RoleDto role) {
-    this.role = role;
+  public void setPermissions(Set<PermissionDto> permissions) {
+    this.permissions = permissions;
   }
 
   public Date getCreatedAt() {

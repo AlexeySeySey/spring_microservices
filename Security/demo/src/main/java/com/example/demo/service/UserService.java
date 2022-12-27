@@ -4,7 +4,7 @@ import com.example.demo.constant.Error;
 import com.example.demo.dto.UserDto;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
-import com.example.demo.mappers.UserMapper;
+import com.example.demo.mapper.UserMapper;
 import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UserRepository;
 import java.util.Optional;

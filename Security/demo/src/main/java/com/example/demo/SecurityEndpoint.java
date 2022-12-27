@@ -2,6 +2,7 @@ package com.example.demo;
 
 import com.example.demo.constant.Error;
 import com.example.demo.constant.Message;
+import com.example.demo.dto.PermissionDto;
 import com.example.demo.dto.UserDto;
 import com.example.demo.entity.Permission;
 import com.example.demo.factory.ResponseFactory;
@@ -112,7 +113,7 @@ public class SecurityEndpoint {
           .orElseThrow(() -> new Exception(Error.UNREGISTERED_USER.get()));
 
       boolean accessAllowed = user.getRole().getPermissions().stream()
-          .map(Permission::getName)
+          .map(PermissionDto::getName)
           .anyMatch(request.getAccess()::equals);
 
       if (!accessAllowed) {

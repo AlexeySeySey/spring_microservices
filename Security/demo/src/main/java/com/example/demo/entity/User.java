@@ -12,12 +12,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "users")
-public class User {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id")
-  private Long id;
+public class User extends BaseEntity {
 
   @Column(name = "email", nullable = false, unique = true)
   private String email;
@@ -28,14 +23,6 @@ public class User {
   @OneToOne(cascade = {CascadeType.ALL})
   @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)
   private Role role;
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
 
   public String getEmail() {
     return email;

@@ -15,12 +15,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "roles")
-public class Role {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id")
-  private Long id;
+public class Role extends BaseEntity {
 
   @Column(name = "name", nullable = false, unique = true)
   private String name;
@@ -29,14 +24,6 @@ public class Role {
   @JoinTable(name = "role_permission", joinColumns = {@JoinColumn(name = "role_id")},
       inverseJoinColumns = {@JoinColumn(name = "permission_id")})
   Set<Permission> permissions = new HashSet<>();
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
 
   public void setName(String name) {
     this.name = name;

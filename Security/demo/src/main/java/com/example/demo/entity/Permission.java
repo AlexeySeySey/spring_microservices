@@ -9,23 +9,10 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "permissions")
-public class Permission {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id")
-  private Long id;
+public class Permission extends BaseEntity {
 
   @Column(name = "name", nullable = false, unique = true)
   private String name;
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
 
   public void setName(String name) {
     this.name = name;
