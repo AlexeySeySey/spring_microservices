@@ -1,6 +1,7 @@
 HELP.md
 target/
 bin
+.metadata
 src/main/resources/logs/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
