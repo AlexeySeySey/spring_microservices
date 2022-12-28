@@ -6,7 +6,7 @@
 //
 
 
-package com.example.demo.client.gen;
+package com.example.demo.security.gen;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -25,7 +25,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="response" type="{http://localhost:8080/demo/gen}response"/&gt;
+ *         &lt;element name="email" type="{http://localhost:8080/demo/gen}email"/&gt;
+ *         &lt;element name="password" type="{http://localhost:8080/demo/gen}password"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -36,36 +37,63 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "response"
+    "email",
+    "password"
 })
-@XmlRootElement(name = "getLoginResponse")
-public class GetLoginResponse {
+@XmlRootElement(name = "getRegistrationRequest")
+public class GetRegistrationRequest {
 
     @XmlElement(required = true)
-    protected Response response;
+    protected String email;
+    @XmlElement(required = true)
+    protected String password;
 
     /**
-     * Gets the value of the response property.
+     * Gets the value of the email property.
      * 
      * @return
      *     possible object is
-     *     {@link Response }
+     *     {@link String }
      *     
      */
-    public Response getResponse() {
-        return response;
+    public String getEmail() {
+        return email;
     }
 
     /**
-     * Sets the value of the response property.
+     * Sets the value of the email property.
      * 
      * @param value
      *     allowed object is
-     *     {@link Response }
+     *     {@link String }
      *     
      */
-    public void setResponse(Response value) {
-        this.response = value;
+    public void setEmail(String value) {
+        this.email = value;
+    }
+
+    /**
+     * Gets the value of the password property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * Sets the value of the password property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setPassword(String value) {
+        this.password = value;
     }
 
 }

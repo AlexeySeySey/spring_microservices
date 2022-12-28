@@ -6,7 +6,7 @@
 //
 
 
-package com.example.demo.client.gen;
+package com.example.demo.security.gen;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -25,8 +25,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="token" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *         &lt;element name="access" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="response" type="{http://localhost:8080/demo/gen}response"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -37,63 +36,36 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "token",
-    "access"
+    "response"
 })
-@XmlRootElement(name = "getAccessRequest")
-public class GetAccessRequest {
+@XmlRootElement(name = "getLoginResponse")
+public class GetLoginResponse {
 
     @XmlElement(required = true)
-    protected String token;
-    @XmlElement(required = true)
-    protected String access;
+    protected Response response;
 
     /**
-     * Gets the value of the token property.
+     * Gets the value of the response property.
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link Response }
      *     
      */
-    public String getToken() {
-        return token;
+    public Response getResponse() {
+        return response;
     }
 
     /**
-     * Sets the value of the token property.
+     * Sets the value of the response property.
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link Response }
      *     
      */
-    public void setToken(String value) {
-        this.token = value;
-    }
-
-    /**
-     * Gets the value of the access property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getAccess() {
-        return access;
-    }
-
-    /**
-     * Sets the value of the access property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setAccess(String value) {
-        this.access = value;
+    public void setResponse(Response value) {
+        this.response = value;
     }
 
 }

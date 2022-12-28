@@ -6,4 +6,4 @@
 //
 
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://localhost:8080/demo/gen", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-package com.example.demo.client.gen;
+package com.example.demo.security.gen;

@@ -6,26 +6,27 @@
 //
 
 
-package com.example.demo.client.gen;
+package com.example.demo.security.gen;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for response complex type.
+ * <p>Java class for anonymous complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="response"&gt;
+ * &lt;complexType&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="data" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *         &lt;element name="error" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="token" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="access" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -35,63 +36,64 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "response", propOrder = {
-    "data",
-    "error"
+@XmlType(name = "", propOrder = {
+    "token",
+    "access"
 })
-public class Response {
+@XmlRootElement(name = "getAccessRequest")
+public class GetAccessRequest {
 
     @XmlElement(required = true)
-    protected String data;
+    protected String token;
     @XmlElement(required = true)
-    protected String error;
+    protected String access;
 
     /**
-     * Gets the value of the data property.
+     * Gets the value of the token property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getData() {
-        return data;
+    public String getToken() {
+        return token;
     }
 
     /**
-     * Sets the value of the data property.
+     * Sets the value of the token property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setData(String value) {
-        this.data = value;
+    public void setToken(String value) {
+        this.token = value;
     }
 
     /**
-     * Gets the value of the error property.
+     * Gets the value of the access property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getError() {
-        return error;
+    public String getAccess() {
+        return access;
     }
 
     /**
-     * Sets the value of the error property.
+     * Sets the value of the access property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setError(String value) {
-        this.error = value;
+    public void setAccess(String value) {
+        this.access = value;
     }
 
 }

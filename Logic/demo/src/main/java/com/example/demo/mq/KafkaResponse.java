@@ -6,6 +6,8 @@ public class KafkaResponse {
 
   private String error;
 
+  private String responseToken;
+
   public void setData(Object data) {
     this.data = data;
   }
@@ -20,5 +22,13 @@ public class KafkaResponse {
 
   public String getError() {
     return error;
+  }
+
+  public String getResponseToken() {
+    return responseToken;
+  }
+
+  public void setResponseToken(String responseToken) {
+    this.responseToken = responseToken;
   }
 }

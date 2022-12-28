@@ -1,34 +1,25 @@
 package com.example.demo.mq;
 
-import java.util.Map;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.example.demo.mq.response.KafkaResponseToken;
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-import com.example.demo.filter.ExceptionHandlerFilter;
-import com.example.demo.mq.response.CategoryListResponse;
-import com.example.demo.mq.response.KafkaBaseResponse;
-import com.example.demo.mq.response.ProductListResponse;
-
 @Component
 public class KafkaEvent {
-	
-	@Autowired
-    private ProductListResponse productListResponse;
-    
-	@Autowired
-    private CategoryListResponse categoryListResponse;
-	
-	@KafkaListener(groupId="group_id", topics="ProductController.list.response")
-	public void listenProductList(String response) {
-		productListResponse.setData(response);
-	}
-	
-	@KafkaListener(groupId="group_id", topics= {"CategoryController.list.response"})
-	public void listenCategoryList(String response) {
-		categoryListResponse.setData(response);
-	}
+
+  private final KafkaResponseContainer kafkaResponseContainer;
+
+  @Autowired
+  public KafkaEvent(KafkaResponseContainer kafkaResponseContainer) {
+    this.kafkaResponseContainer = kafkaResponseContainer;
+  }
+
+  @KafkaListener(groupId = "group_id", topics = {"CategoryController.list.response",
+      "ProductController.list.response"})
+  public void listen(String response) {
+    KafkaResponseToken responseToken = new Gson().fromJson(response, KafkaResponseToken.class);
+    kafkaResponseContainer.addResponse(responseToken.getResponseToken(), response);
+  }
 }

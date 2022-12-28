@@ -1,26 +1,24 @@
 package com.example.demo.mq.request;
 
-import com.example.demo.contract.Jsonable;
+public class ProductListRequest {
 
-public class ProductListRequest implements Jsonable {
-	
-	private String searchQuery;
-	
-	private String category;
-	
-	public String getSearchQuery() {
-		return this.searchQuery;
-	}
-	
-	public String getCategory() {
-		return this.category;
-	}
-	
-	public void setSearchQuery(String searchQuery) {
-		this.searchQuery = searchQuery;
-	}
-	
-	public void setCategory(String category) {
-		this.category = category;
-	}
+  private String productName;
+
+  private String category;
+
+  public String getProductName() {
+    return productName;
+  }
+
+  public void setProductName(String productName) {
+    this.productName = productName;
+  }
+
+  public String getCategory() {
+    return category;
+  }
+
+  public void setCategory(String category) {
+    this.category = category;
+  }
 }

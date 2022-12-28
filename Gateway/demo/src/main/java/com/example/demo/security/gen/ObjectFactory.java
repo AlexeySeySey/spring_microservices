@@ -6,7 +6,7 @@
 //
 
 
-package com.example.demo.client.gen;
+package com.example.demo.security.gen;
 
 import javax.xml.bind.annotation.XmlRegistry;
 
