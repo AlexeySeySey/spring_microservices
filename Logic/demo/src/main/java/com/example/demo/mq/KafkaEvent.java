@@ -4,7 +4,6 @@ import com.example.demo.dto.CategoryDto;
 import com.example.demo.dto.ProductDto;
 import com.example.demo.factory.KafkaResponseFactory;
 import com.example.demo.mq.request.Request;
-import com.example.demo.mq.request.ProductListRequest;
 import com.example.demo.service.CategoryService;
 import com.example.demo.service.ProductService;
 import java.util.List;
@@ -25,9 +24,7 @@ public class KafkaEvent {
   private static final Logger logger = LogManager.getLogger(KafkaEvent.class);
 
   @Autowired
-  public KafkaEvent(
-      ProductService productService,
-      CategoryService categoryService,
+  public KafkaEvent(ProductService productService, CategoryService categoryService,
       KafkaTemplate<String, KafkaResponse> kafkaTemplate) {
     this.productService = productService;
     this.categoryService = categoryService;
@@ -35,15 +32,13 @@ public class KafkaEvent {
   }
 
   @KafkaListener(groupId = "group_id", topics = {"ProductController.list"})
-  public void listenProductList(Request<ProductListRequest> request) {
-
+  public void listenProductList(Request request) {
     String error = null;
     List<ProductDto> products = null;
-    ProductListRequest productListRequest = request.getRequest();
 
     try {
-      products = productService.findAll(productListRequest.getProductName(),
-          productListRequest.getCategory());
+      products = productService.findAll(request.getRequest().get("productName"),
+          request.getRequest().get("category"));
     } catch (Exception e) {
       error = e.getMessage();
       logger.error("ERROR", e);
@@ -54,7 +49,7 @@ public class KafkaEvent {
   }
 
   @KafkaListener(groupId = "group_id", topics = {"CategoryController.list"})
-  public void listenCategoryList(Request<?> request) {
+  public void listenCategoryList(Request request) {
 
     String error = null;
     List<CategoryDto> categories = null;
@@ -66,7 +61,8 @@ public class KafkaEvent {
       logger.error("ERROR", e);
     }
 
-    KafkaResponse response = KafkaResponseFactory.make(categories, error, request.getResponseToken());
+    KafkaResponse response = KafkaResponseFactory.make(categories, error,
+        request.getResponseToken());
     kafkaTemplate.send("CategoryController.list.response", response);
   }
 }

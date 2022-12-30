@@ -33,7 +33,7 @@ public class KafkaProducer {
   public String request(String topic, Object request, boolean hasResponse) throws Exception {
 
     String token = UUID.randomUUID().toString();
-    kafkaResponseContainer.addResponse(token, null);
+    kafkaResponseContainer.addResponse(token, "");
 
     KafkaRequest kafkaRequest = new KafkaRequest();
     kafkaRequest.setResponseToken(token);

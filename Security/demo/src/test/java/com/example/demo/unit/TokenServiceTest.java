@@ -1,4 +1,4 @@
-package com.example.demo.Unit;
+package com.example.demo.unit;
 
 import com.example.demo.service.TokenService;
 import io.jsonwebtoken.JwtException;

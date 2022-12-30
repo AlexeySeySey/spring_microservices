@@ -4,7 +4,6 @@ import com.example.demo.constant.Error;
 import com.example.demo.constant.Message;
 import com.example.demo.dto.PermissionDto;
 import com.example.demo.dto.UserDto;
-import com.example.demo.entity.Permission;
 import com.example.demo.factory.ResponseFactory;
 import com.example.demo.gen.GetAccessRequest;
 import com.example.demo.gen.GetAccessResponse;
@@ -27,13 +26,13 @@ import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 @Endpoint
 public class SecurityEndpoint {
 
-  public final static String NAMESPACE_URI = "${server.host}:${server.port}${ws.endpoint.url}";
+  public final static String NAMESPACE_URI = "http://localhost:8080/demo/gen";
 
-  private UserService userService;
+  private final UserService userService;
 
-  private TokenService tokenService;
+  private final TokenService tokenService;
 
-  private ResponseFactory responseFactory;
+  private final ResponseFactory responseFactory;
 
   @Autowired
   public SecurityEndpoint(
@@ -78,7 +77,7 @@ public class SecurityEndpoint {
       UserDto user = userService.findByEmail(request.getEmail())
           .orElseThrow(() -> new Exception(Error.UNREGISTERED_USER.get()));
 
-      if (!userService.passwordsSame(user.getPassword(), request.getPassword())) {
+      if (!userService.passwordsSame(request.getPassword(), user.getPassword())) {
         throw new Exception(Error.UNREGISTERED_USER.get());
       }
 

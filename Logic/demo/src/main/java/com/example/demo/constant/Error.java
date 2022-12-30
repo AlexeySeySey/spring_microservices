@@ -2,8 +2,7 @@ package com.example.demo.constant;
 
 public enum Error {
 
-  UNAUTHORIZED("Unauthorized"),
-  KAFKA_TIMEOUT("Request processing takes too long");
+  REQUEST_DESERIALIZATION_FAILURE("Deserialization from byte[] to Request failed");
 
   private final String data;
 

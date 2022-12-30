@@ -1,10 +1,27 @@
 package com.example.demo.mq.request;
 
-public class Request<T> {
+import com.example.demo.constant.Error;
+import com.google.gson.Gson;
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.kafka.common.errors.SerializationException;
+import org.apache.kafka.common.serialization.Deserializer;
 
-  protected String responseToken;
+public class Request implements Deserializer<Request> {
 
-  protected T request;
+  private String responseToken;
+
+  private Map<String, String> request = new HashMap<>();
+
+  @Override
+  public Request deserialize(String topic, byte[] data) {
+    try {
+      return data == null ? null
+          : new Gson().fromJson(new String(data), Request.class);
+    } catch (Exception e) {
+      throw new SerializationException(Error.REQUEST_DESERIALIZATION_FAILURE.get());
+    }
+  }
 
   public String getResponseToken() {
     return responseToken;
@@ -14,11 +31,11 @@ public class Request<T> {
     this.responseToken = responseToken;
   }
 
-  public T getRequest() {
+  public Map<String, String> getRequest() {
     return request;
   }
 
-  public void setRequest(T request) {
+  public void setRequest(Map<String, String> request) {
     this.request = request;
   }
 }

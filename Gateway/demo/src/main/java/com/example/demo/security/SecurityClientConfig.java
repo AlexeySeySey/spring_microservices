@@ -16,7 +16,7 @@ public class SecurityClientConfig {
   @Bean
   public Jaxb2Marshaller marshaller() {
     Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-    marshaller.setContextPath("com.example.demo.client.gen");
+    marshaller.setContextPath("com.example.demo.security.gen");
     return marshaller;
   }
 

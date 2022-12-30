@@ -4,7 +4,6 @@ import com.example.demo.dto.CategoryDto;
 import com.example.demo.mapper.CategoryMapper;
 import com.example.demo.repository.CategoryRepository;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -29,9 +28,6 @@ public class CategoryService {
   @Cacheable("${cache.keys.categoriesList}")
   @Transactional(isolation = Isolation.READ_COMMITTED)
   public List<CategoryDto> findAll() {
-    return categoryRepository.findAll()
-        .stream()
-        .map(categoryMapper::categoryToDto)
-        .collect(Collectors.toList());
+    return categoryMapper.categoriesToDtos(categoryRepository.findAll());
   }
 }

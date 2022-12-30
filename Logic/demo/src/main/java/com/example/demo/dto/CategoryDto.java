@@ -1,13 +1,12 @@
 package com.example.demo.dto;
 
+import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
-public class CategoryDto {
+public class CategoryDto implements Serializable {
 
   private Long id;
   private String name;
-  private List<ProductDto> products;
   private Date createdAt;
   private Date updatedAt;
 
@@ -25,14 +24,6 @@ public class CategoryDto {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public List<ProductDto> getProducts() {
-    return products;
-  }
-
-  public void setProducts(List<ProductDto> products) {
-    this.products = products;
   }
 
   public Date getCreatedAt() {

@@ -1,15 +1,15 @@
 package com.example.demo.dto;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class ProductDto {
+public class ProductDto implements Serializable {
 
   private Long id;
   private String name;
   private String image;
   private BigDecimal price;
-  private CategoryDto category;
   private Date createdAt;
   private Date updatedAt;
 
@@ -43,14 +43,6 @@ public class ProductDto {
 
   public void setPrice(BigDecimal price) {
     this.price = price;
-  }
-
-  public CategoryDto getCategory() {
-    return category;
-  }
-
-  public void setCategory(CategoryDto category) {
-    this.category = category;
   }
 
   public Date getCreatedAt() {

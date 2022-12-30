@@ -3,7 +3,6 @@ package com.example.demo.entity;
 import java.math.BigDecimal;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -21,8 +20,8 @@ public class Product extends BaseEntity {
   @Column(name = "price", nullable = false)
   private BigDecimal price;
 
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "category_id")
+  @ManyToOne
+  @JoinColumn(name = "category_id", nullable = false)
   private Category category;
 
   public String getName() {

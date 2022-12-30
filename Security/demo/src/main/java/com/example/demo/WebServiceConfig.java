@@ -1,7 +1,6 @@
 package com.example.demo;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -21,9 +20,6 @@ import org.springframework.xml.xsd.XsdSchema;
 @EnableAsync
 @Configuration
 public class WebServiceConfig extends WsConfigurerAdapter {
-
-  @Value("${server.host}:${server.port}${ws.endpoint.url}")
-  private String wsdlTargetNamespace;
 
   @Override
   public void addInterceptors(List<EndpointInterceptor> interceptors) {
@@ -47,7 +43,7 @@ public class WebServiceConfig extends WsConfigurerAdapter {
     DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
     wsdl11Definition.setPortTypeName("SecurityPort");
     wsdl11Definition.setLocationUri("/ws");
-    wsdl11Definition.setTargetNamespace(wsdlTargetNamespace);
+    wsdl11Definition.setTargetNamespace("http://localhost:8080/demo/gen");
     wsdl11Definition.setSchema(schema);
     return wsdl11Definition;
   }

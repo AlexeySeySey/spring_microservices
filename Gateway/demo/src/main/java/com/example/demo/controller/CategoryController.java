@@ -19,6 +19,6 @@ public class CategoryController {
 
   @GetMapping("/")
   public String index() throws Exception {
-    return kafkaProducer.request("CategoryController.list", "", true);
+    return kafkaProducer.request("CategoryController.list", null, true);
   }
 }

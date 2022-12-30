@@ -8,7 +8,7 @@ public enum Error {
   USER_REGISTERED("User with such email already registered"),
   UNREGISTERED_USER("User with such credentials is not registered");
 
-  private String data;
+  private final String data;
 
   Error(String data) {
     this.data = data;

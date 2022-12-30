@@ -3,6 +3,7 @@ package com.example.demo.aspect;
 import com.example.demo.constant.Error;
 import com.example.demo.security.SecurityClient;
 import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -37,19 +38,16 @@ public class SecurityMiddlewareAspect {
         .map(r -> r.getHeader("Authorization"))
         .orElseThrow(() -> new Exception(Error.UNAUTHORIZED.get()));
 
-    String token = authHeader.replace("Bearer:", "")
-        .replace("\\s", "")
-        .trim();
+    String token = authHeader.replace("Bearer:", "").replace("\\s", "").trim();
 
     MethodSignature signature = (MethodSignature) point.getSignature();
 
     String access = String.format("%s.%s", point.getTarget().getClass().getSimpleName(),
         signature.getMethod().getName());
 
-    String error = securityClient.getAccess(token, access)
-        .getResponse().getError();
+    String error = securityClient.getAccess(token, access).getResponse().getError();
 
-    if (error != null) {
+    if (StringUtils.isNotBlank(error)) {
       throw new Exception(error);
     }
   }

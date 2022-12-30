@@ -24,7 +24,7 @@ public class UserService {
 
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-  private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+  private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
   @Autowired
   public UserService(
@@ -60,7 +60,7 @@ public class UserService {
     return userRepository.findByEmail(email).map(userMapper::userToDto);
   }
 
-  public boolean passwordsSame(String password1, String password2) {
-    return bCryptPasswordEncoder.matches(password1, password2);
+  public boolean passwordsSame(String rawPassword, String encodedPassword) {
+    return bCryptPasswordEncoder.matches(rawPassword, encodedPassword);
   }
 }
