@@ -18,7 +18,7 @@ public class KafkaResponseContainer {
     return responses.get(id);
   }
 
-  public void removeResponse(@NotNull String id) {
+  public void removeResponse(@NonNull String id) {
     responses.remove(id);
   }
 }
