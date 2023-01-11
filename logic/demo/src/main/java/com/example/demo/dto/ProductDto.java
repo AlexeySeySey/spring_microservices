@@ -3,6 +3,7 @@ package com.example.demo.dto;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class ProductDto implements Serializable {
 
@@ -12,6 +13,7 @@ public class ProductDto implements Serializable {
   private String name;
   private String image;
   private BigDecimal price;
+
   private LocalDate createdAt;
   private LocalDate updatedAt;
 
@@ -61,5 +63,23 @@ public class ProductDto implements Serializable {
 
   public void setUpdatedAt(LocalDate updatedAt) {
     this.updatedAt = updatedAt;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    ProductDto that = (ProductDto) o;
+    return id.equals(that.id) && name.equals(that.name) && Objects.equals(image, that.image)
+        && Objects.equals(price, that.price);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, name, image, price);
   }
 }

@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -43,5 +44,23 @@ public class User extends BaseEntity {
 
   public void setRole(Role role) {
     this.role = role;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    User user = (User) o;
+    return id.equals(user.id) && email.equals(user.email) && Objects.equals(password, user.password)
+        && Objects.equals(role, user.role);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, email, password, role);
   }
 }

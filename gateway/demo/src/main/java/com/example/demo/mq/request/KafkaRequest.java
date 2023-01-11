@@ -1,5 +1,7 @@
 package com.example.demo.mq.request;
 
+import java.util.Objects;
+
 public class KafkaRequest {
 
   private String responseToken;

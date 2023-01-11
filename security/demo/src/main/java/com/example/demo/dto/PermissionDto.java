@@ -1,6 +1,7 @@
 package com.example.demo.dto;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class PermissionDto {
 
@@ -39,5 +40,22 @@ public class PermissionDto {
 
   public void setUpdatedAt(LocalDate updatedAt) {
     this.updatedAt = updatedAt;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    PermissionDto that = (PermissionDto) o;
+    return id.equals(that.id) && name.equals(that.name);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, name);
   }
 }

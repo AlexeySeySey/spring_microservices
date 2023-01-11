@@ -1,6 +1,7 @@
 package com.example.demo.entity;
 
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
@@ -30,5 +31,22 @@ public class Category extends BaseEntity {
 
   public void setProducts(List<Product> products) {
     this.products = products;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Category category = (Category) o;
+    return id.equals(category.id) && name.equals(category.name) && Objects.equals(products, category.products);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, name, products);
   }
 }

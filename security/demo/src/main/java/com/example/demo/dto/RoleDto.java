@@ -1,13 +1,15 @@
 package com.example.demo.dto;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
+import java.util.Objects;
 
 public class RoleDto {
 
   private Long id;
   private String name;
-  Set<PermissionDto> permissions;
+
+  List<PermissionDto> permissions;
   private LocalDate createdAt;
   private LocalDate updatedAt;
 
@@ -27,11 +29,11 @@ public class RoleDto {
     this.name = name;
   }
 
-  public Set<PermissionDto> getPermissions() {
+  public List<PermissionDto> getPermissions() {
     return permissions;
   }
 
-  public void setPermissions(Set<PermissionDto> permissions) {
+  public void setPermissions(List<PermissionDto> permissions) {
     this.permissions = permissions;
   }
 
@@ -49,5 +51,23 @@ public class RoleDto {
 
   public void setUpdatedAt(LocalDate updatedAt) {
     this.updatedAt = updatedAt;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    RoleDto roleDto = (RoleDto) o;
+    return id.equals(roleDto.id) && name.equals(roleDto.name) && Objects.equals(permissions,
+        roleDto.permissions);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, name, permissions);
   }
 }
