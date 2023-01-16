@@ -24,7 +24,7 @@ public class ProductService {
   @PersistenceContext
   private EntityManager em;
 
-  @Transactional(isolation = Isolation.READ_COMMITTED)
+  @Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true)
   public List<ProductDto> findAll(String name, String category) {
 
     CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();

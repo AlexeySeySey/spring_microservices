@@ -55,7 +55,7 @@ public class UserService {
     return userRepository.save(user);
   }
 
-  @Transactional(isolation = Isolation.READ_COMMITTED)
+  @Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true)
   public Optional<UserDto> findByEmail(String email) {
     return userRepository.findByEmail(email).map(userMapper::userToDto);
   }

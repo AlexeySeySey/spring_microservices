@@ -26,7 +26,7 @@ public class CategoryService {
   }
 
   @Cacheable("${cache.keys.categoriesList}")
-  @Transactional(isolation = Isolation.READ_COMMITTED)
+  @Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true)
   public List<CategoryDto> findAll() {
     return categoryMapper.categoriesToDtos(categoryRepository.findAll());
   }
